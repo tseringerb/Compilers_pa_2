@@ -119,7 +119,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitField(FieldContext ctx) {
 		// TODO Auto-generated method stub
 		System.out.println("FIELD " + ctx.getText() + " " + mjSymbolTable.getCurrentScopeName() + " " + mjSymbolTable.getCurrentScopeType());
-		return super.visitField(ctx);
+		return (Record) super.visitField(ctx);
 	}
 
 	@Override
@@ -128,17 +128,16 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		System.out.println("PLUS " + ctx.getChild(0).getText());
 		String errMsg = "Wrong type in Additative Expression";
 		System.out.println("FIRST");
-		Record first = visit(ctx.getChild(0));
+		Record first = (Record)visit(ctx.getChild(0));
 		System.out.println("TYPE " + first.toString());
 		String firstType = visit(ctx.getChild(0)).getType(); // Get first type
 		int numChildren = ctx.getChildCount();
 		System.out.println("LINE " + ctx.getStart().getLine() + " " + ctx.getStart().getCharPositionInLine());
-		printError(ctx,errMsg);
+
 		for (int i=2; i<numChildren; i+=2) {
 		String type = visit(ctx.getChild(i)).getType();
 		if (!type.equals(firstType)){
-		//print(errMsg);
-			System.out.println(errMsg);
+			printError(ctx, errMsg);
 			}
 		}
 		return null;//firstType;
