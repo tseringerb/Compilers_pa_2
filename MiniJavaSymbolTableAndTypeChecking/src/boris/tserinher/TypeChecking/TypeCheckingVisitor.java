@@ -1,12 +1,16 @@
 package boris.tserinher.TypeChecking;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import boris.tserinher.MiniJavaGrammarBaseVisitor;
 import boris.tserinher.MiniJavaGrammarParser.ClassDeclarationContext;
 import boris.tserinher.MiniJavaGrammarParser.FieldContext;
+import boris.tserinher.MiniJavaGrammarParser.IDExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.MainClassContext;
 import boris.tserinher.MiniJavaGrammarParser.MainMethodContext;
 import boris.tserinher.MiniJavaGrammarParser.MethodContext;
 import boris.tserinher.MiniJavaGrammarParser.PlusExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.PrePlusMinusIntegerExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.StartContext;
 import boris.tserinher.Records.Record;
 import boris.tserinher.SymbolTable.MiniJavaSymbolTable;
@@ -19,6 +23,10 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public TypeCheckingVisitor(MiniJavaSymbolTable mjSymbolTable) {
 		//TODO может передавать таблицу не в конструктором, а сетером
 		this.mjSymbolTable = mjSymbolTable;
+	}
+	
+	private static void printError(ParserRuleContext ctx, String message){
+		System.out.printf("In line %s: %s\n", ctx.getStart().getLine(), message);
 	}
 	
 	@Override
@@ -117,23 +125,45 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	@Override
 	public Record visitPlusExpression(PlusExpressionContext ctx) {
 		// TODO Auto-generated method stub
-		/*System.out.println("PLUS " + ctx.getChild(0).getText());
+		System.out.println("PLUS " + ctx.getChild(0).getText());
 		String errMsg = "Wrong type in Additative Expression";
 		System.out.println("FIRST");
 		Record first = visit(ctx.getChild(0));
 		System.out.println("TYPE " + first.toString());
-		String firstType = visit(ctx.getChild(0)).toString(); // Get first type
+		String firstType = visit(ctx.getChild(0)).getType(); // Get first type
 		int numChildren = ctx.getChildCount();
+		System.out.println("LINE " + ctx.getStart().getLine() + " " + ctx.getStart().getCharPositionInLine());
+		printError(ctx,errMsg);
 		for (int i=2; i<numChildren; i+=2) {
-		String type = visit(ctx.getChild(i)).toString();
+		String type = visit(ctx.getChild(i)).getType();
 		if (!type.equals(firstType)){
 		//print(errMsg);
+			System.out.println(errMsg);
 			}
-		}*/
+		}
 		return null;//firstType;
 		
 		//return super.visitPlusExpression(ctx);
 	}
+
+	@Override
+	public Record visitPrePlusMinusIntegerExpression(
+			PrePlusMinusIntegerExpressionContext ctx) {
+		// TODO Auto-generated method stub
+		System.out.println("INT EXPRESSION " + ctx.getText());
+		Record intRecord = new Record("int", "int");
+		return intRecord;
+	}
+
+	@Override
+	public Record visitIDExpression(IDExpressionContext ctx) {
+		// TODO Auto-generated method stub
+		System.out.println("ID EXPRESSION " + ctx.getText());
+		Record idRecord = new Record(ctx.getText(), "int"); 
+		return idRecord;
+	}
+	
+	
 	
 	
 	
