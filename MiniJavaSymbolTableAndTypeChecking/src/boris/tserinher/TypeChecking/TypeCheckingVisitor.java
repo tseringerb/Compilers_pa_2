@@ -4,14 +4,20 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import boris.tserinher.MiniJavaGrammarBaseVisitor;
 import boris.tserinher.MiniJavaGrammarParser.ClassDeclarationContext;
+import boris.tserinher.MiniJavaGrammarParser.DivExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.FieldContext;
 import boris.tserinher.MiniJavaGrammarParser.IDExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.LessExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.MainClassContext;
 import boris.tserinher.MiniJavaGrammarParser.MainMethodContext;
 import boris.tserinher.MiniJavaGrammarParser.MethodContext;
+import boris.tserinher.MiniJavaGrammarParser.MinusExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.MultExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.PlusExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.PrePlusMinusIntegerExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.StartContext;
+import boris.tserinher.MiniJavaGrammarParser.ThisExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.WhileStatementContext;
 import boris.tserinher.Records.Record;
 import boris.tserinher.SymbolTable.MiniJavaSymbolTable;
 
@@ -22,22 +28,42 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	private String notDeclareError = "Not decalre identifire";
 	private static int ErrorCounter = 0;
 	
-	public static int getErrorCounter() {
+	public int getErrorCounter() {
 		return ErrorCounter;
 	}
-
-	public static void setErrorCounter(int errorCounter) {
-		ErrorCounter = errorCounter;
-	}
-
+	
 	public TypeCheckingVisitor(MiniJavaSymbolTable mjSymbolTable) {
 		//TODO может передавать таблицу не в конструктором, а сетером
 		this.mjSymbolTable = mjSymbolTable;
 	}
 	
-	private static void printError(ParserRuleContext ctx, String message){
+	private void printError(ParserRuleContext ctx, String message){
 		System.out.printf("----> In line %s: %s\n", ctx.getStart().getLine(), message);
 		ErrorCounter++;
+	}
+	
+	private Record checkMathExpr(ParserRuleContext ctx, String errMsg){
+		
+		/*System.out.println("MATH " + ctx.getText());
+		Record first = visit(ctx.getChild(0));
+		String firstType = first.getType(); // Get first type
+		String firstId = first.getId();
+		System.out.println("FIRST " + firstId + " " + firstType);
+		int numChildren = ctx.getChildCount();
+		//System.out.println("LINE " + ctx.getStart().getLine() + " " + ctx.getStart().getCharPositionInLine());
+		for (int i=2; i<numChildren; i+=2) {
+		String type = visit(ctx.getChild(i)).getType();
+		if (!type.equals(firstType)){
+			printError(ctx, errMsg);
+			}
+		}*/
+		
+		String firstType = ""; // Get first type
+		String firstId = "";
+		 
+		Record mathRecord = new Record(firstType, firstType);
+		
+		return mathRecord;//firstType;
 	}
 	
 	@Override
@@ -136,13 +162,13 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	@Override
 	public Record visitPlusExpression(PlusExpressionContext ctx) {
 		// TODO Auto-generated method stub
-		System.out.println("PLUS " + ctx.getText());
+		//System.out.println("PLUS " + ctx.getText());
 		String errMsg = "Wrong type in Additative Expression";
 		
-		Record first = (Record)visit(ctx.getChild(0));
+		/*Record first = (Record)visit(ctx.getChild(0));
 		String firstType = first.getType(); // Get first type
 		String firstId = first.getId();
-		System.out.println("FIRST " + firstId);
+		//System.out.println("FIRST " + firstId);
 		if(!firstId.equals("int")){ //по идее нужно проверить на все зарезервировынне слова для типов
 			if(mjSymbolTable.lookup(firstId) == null){
 				printError(ctx, notDeclareError);
@@ -157,10 +183,35 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 			printError(ctx, errMsg);
 			}
 		}
-		Record plusRecord = new Record(firstType, firstType);
-		return plusRecord;//firstType;
+		Record plusRecord = new Record(firstType, firstType);*/
+		
+		return checkMathExpr(ctx, errMsg);//firstType;
 		
 		//return super.visitPlusExpression(ctx);
+	}
+	
+	
+
+	@Override
+	public Record visitMinusExpression(MinusExpressionContext ctx) {
+		String errMsg = "Wrong type in Subtuction Expression";
+		// TODO Auto-generated method stub
+		return checkMathExpr(ctx, errMsg);
+	}
+
+	@Override
+	public Record visitDivExpression(DivExpressionContext ctx) {
+		String errMsg = "Wrong type in Division Expression";
+		
+		// TODO Auto-generated method stub
+		return checkMathExpr(ctx, errMsg);
+	}
+
+	@Override
+	public Record visitMultExpression(MultExpressionContext ctx) {
+		String errMsg = "Wrong type in Multiplication Expression";
+		// TODO Auto-generated method stub
+		return checkMathExpr(ctx, errMsg);
 	}
 
 	@Override
@@ -176,9 +227,54 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitIDExpression(IDExpressionContext ctx) {
 		// TODO Auto-generated method stub
 		//System.out.println("ID EXPRESSION " + ctx.getText());
-		Record idRecord = new Record(ctx.getText(), "int"); 
+		String errMesg = "Not declare identifire";
+		String id = ctx.getText();
+		Record idRecord = mjSymbolTable.lookup(id);
+		
+		
+		
+		if(idRecord == null){
+			printError(ctx, errMesg);
+			System.out.println(id);
+		}
 		return idRecord;
 	}
+
+	@Override
+	public Record visitThisExpression(ThisExpressionContext ctx) {
+		// TODO Auto-generated method stub
+		//System.out.println("THIS");
+		return super.visitThisExpression(ctx);
+	}
+	
+	@Override
+	 public Record visitWhileStatement(WhileStatementContext ctx) {
+	        System.out.println("INSIDE WHILE STM");
+	        try {
+	      Record whileArg = visit(ctx.getChild(1));
+	      System.out.println("whileArg " + ctx.getChild(1).getText());
+	      if (whileArg == null) { 
+	       System.out.println("NPE on while");
+	      } else if(!whileArg.getType().equalsIgnoreCase("boolean")) {
+	       System.out.println("While stmt not bool, it is " + whileArg.getType());
+	      }
+	      
+	        } catch (Exception e) {
+	         e.printStackTrace();
+	        }
+	  return null;
+	 }
+	
+	public Record visitLessExpression(LessExpressionContext ctx) {
+		  System.out.println("VISITING LESS EXPR");
+		  Record arg1 = visit(ctx.getChild(0));
+		  Record arg2 = visit(ctx.getChild(2));
+		  if (arg1 == null || arg2 == null) {
+		   System.out.println("NPE on less expression");
+		   return null;
+		  }
+		  return new Record(arg1.getId() + "<" + arg2.getId(), "boolean");
+		 }
 	
 	
 	
