@@ -44,6 +44,11 @@ public class MainMiniJavaChecker {
 		miniJavaSymbolTable.resetTable();
 		TypeCheckingVisitor checkingVisitor = new TypeCheckingVisitor(miniJavaSymbolTable);
 		checkingVisitor.visit(tree);
+		if(checkingVisitor.getErrorCounter() != 0){
+			System.out.printf("Program faild with %d error\\s\n", checkingVisitor.getErrorCounter());
+		} else {
+			System.out.println("Programm success");
+		}
 		
 	}
 

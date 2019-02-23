@@ -19,14 +19,25 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	
 	private MiniJavaSymbolTable mjSymbolTable;
 	private String currentScope; //for debug
+	private String notDeclareError = "Not decalre identifire";
+	private static int ErrorCounter = 0;
 	
+	public static int getErrorCounter() {
+		return ErrorCounter;
+	}
+
+	public static void setErrorCounter(int errorCounter) {
+		ErrorCounter = errorCounter;
+	}
+
 	public TypeCheckingVisitor(MiniJavaSymbolTable mjSymbolTable) {
 		//TODO может передавать таблицу не в конструктором, а сетером
 		this.mjSymbolTable = mjSymbolTable;
 	}
 	
 	private static void printError(ParserRuleContext ctx, String message){
-		System.out.printf("In line %s: %s\n", ctx.getStart().getLine(), message);
+		System.out.printf("----> In line %s: %s\n", ctx.getStart().getLine(), message);
+		ErrorCounter++;
 	}
 	
 	@Override
@@ -118,29 +129,36 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	@Override
 	public Record visitField(FieldContext ctx) {
 		// TODO Auto-generated method stub
-		System.out.println("FIELD " + ctx.getText() + " " + mjSymbolTable.getCurrentScopeName() + " " + mjSymbolTable.getCurrentScopeType());
+		//System.out.println("FIELD " + ctx.getText() + " " + mjSymbolTable.getCurrentScopeName() + " " + mjSymbolTable.getCurrentScopeType());
 		return (Record) super.visitField(ctx);
 	}
 
 	@Override
 	public Record visitPlusExpression(PlusExpressionContext ctx) {
 		// TODO Auto-generated method stub
-		System.out.println("PLUS " + ctx.getChild(0).getText());
+		System.out.println("PLUS " + ctx.getText());
 		String errMsg = "Wrong type in Additative Expression";
-		System.out.println("FIRST");
+		
 		Record first = (Record)visit(ctx.getChild(0));
-		System.out.println("TYPE " + first.toString());
-		String firstType = visit(ctx.getChild(0)).getType(); // Get first type
+		String firstType = first.getType(); // Get first type
+		String firstId = first.getId();
+		System.out.println("FIRST " + firstId);
+		if(!firstId.equals("int")){ //по идее нужно проверить на все зарезервировынне слова для типов
+			if(mjSymbolTable.lookup(firstId) == null){
+				printError(ctx, notDeclareError);
+				} 
+			}
+			//System.out.println("TYPE " + first.toString());
 		int numChildren = ctx.getChildCount();
-		System.out.println("LINE " + ctx.getStart().getLine() + " " + ctx.getStart().getCharPositionInLine());
-
+		//System.out.println("LINE " + ctx.getStart().getLine() + " " + ctx.getStart().getCharPositionInLine());
 		for (int i=2; i<numChildren; i+=2) {
 		String type = visit(ctx.getChild(i)).getType();
 		if (!type.equals(firstType)){
 			printError(ctx, errMsg);
 			}
 		}
-		return null;//firstType;
+		Record plusRecord = new Record(firstType, firstType);
+		return plusRecord;//firstType;
 		
 		//return super.visitPlusExpression(ctx);
 	}
@@ -149,7 +167,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitPrePlusMinusIntegerExpression(
 			PrePlusMinusIntegerExpressionContext ctx) {
 		// TODO Auto-generated method stub
-		System.out.println("INT EXPRESSION " + ctx.getText());
+		//System.out.println("INT EXPRESSION " + ctx.getText());
 		Record intRecord = new Record("int", "int");
 		return intRecord;
 	}
@@ -157,7 +175,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	@Override
 	public Record visitIDExpression(IDExpressionContext ctx) {
 		// TODO Auto-generated method stub
-		System.out.println("ID EXPRESSION " + ctx.getText());
+		//System.out.println("ID EXPRESSION " + ctx.getText());
 		Record idRecord = new Record(ctx.getText(), "int"); 
 		return idRecord;
 	}
