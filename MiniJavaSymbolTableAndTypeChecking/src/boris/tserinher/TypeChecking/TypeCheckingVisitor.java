@@ -5,6 +5,9 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import boris.tserinher.MiniJavaGrammarBaseVisitor;
+import boris.tserinher.MiniJavaGrammarParser.AndExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.ArrayAssignStatementsContext;
+import boris.tserinher.MiniJavaGrammarParser.ArrayExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.AssignmentStatementContext;
 import boris.tserinher.MiniJavaGrammarParser.BoolTypeExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.BreakeStatementContext;
@@ -12,8 +15,11 @@ import boris.tserinher.MiniJavaGrammarParser.ClassDeclarationContext;
 import boris.tserinher.MiniJavaGrammarParser.ContinueStatementContext;
 import boris.tserinher.MiniJavaGrammarParser.DivExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.DoWhileStatementContext;
+import boris.tserinher.MiniJavaGrammarParser.EqualExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.ExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.FieldContext;
 import boris.tserinher.MiniJavaGrammarParser.IDExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.IfStatmentContext;
 import boris.tserinher.MiniJavaGrammarParser.LessExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.MainClassContext;
 import boris.tserinher.MiniJavaGrammarParser.MainMethodContext;
@@ -23,7 +29,10 @@ import boris.tserinher.MiniJavaGrammarParser.MethodContext;
 import boris.tserinher.MiniJavaGrammarParser.MethodInvocationContext;
 import boris.tserinher.MiniJavaGrammarParser.MinusExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.MultExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.NewArrayExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.NewObjectExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.NotExpressionContext;
+import boris.tserinher.MiniJavaGrammarParser.OrExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.PlusExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.PrePlusMinusIntegerExpressionContext;
 import boris.tserinher.MiniJavaGrammarParser.RBExprContext;
@@ -39,6 +48,7 @@ import boris.tserinher.Records.VarRecord;
 import boris.tserinher.SymbolTable.MiniJavaSymbolTable;
 
 public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
+
 
 	private MiniJavaSymbolTable mjSymbolTable;
 	private String currentScope; // for debug
@@ -236,17 +246,48 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		System.out.println("INSIDE WHILE STM");
 		try {
 			Record whileArg = visit(ctx.getChild(1));
-			System.out.println("whileArg " + ctx.getChild(1).getText());
 			if (whileArg == null) {
-				System.out.println("NPE on while");
+				printError(ctx, "NPE on while");
 			} else if (!whileArg.getType().equalsIgnoreCase("boolean")) {
-				System.out.println("While stmt not bool, it is " + whileArg.getType());
+				printError(ctx, "While stmt not bool, it is " + whileArg.getType());
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return super.visitWhileStatement(ctx);
+	}
+	
+	@Override
+	public Record visitDoWhileStatement(DoWhileStatementContext ctx) {
+		try {
+			Record whileArg = visit(ctx.getChild(3));
+			if (whileArg == null) {
+				printError(ctx, "NPE on do-while");
+			} else if (!whileArg.getType().equalsIgnoreCase("boolean")) {
+				printError(ctx, "Do-While stmt not bool, it is " + whileArg.getType());
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return super.visitDoWhileStatement(ctx);
+	}
+	
+	@Override
+	public Record visitIfStatment(IfStatmentContext ctx) {
+		try {
+			Record ifArg = visit(ctx.getChild(1));
+			if (ifArg == null) {
+				printError(ctx, "NPE on if");
+			} else if (!ifArg.getType().equalsIgnoreCase("boolean")) {
+				printError(ctx,"If stmt not bool, it is " + ifArg.getType());
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return super.visitIfStatment(ctx);
 	}
 
 	public Record visitLessExpression(LessExpressionContext ctx) {
@@ -282,8 +323,16 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 		if (!firstValId.equals(secondValId)) {
 			printError(ctx, errMsg);
+		/*	mjSymbolTable.printTable();
+			System.out.println(firstValId +" != "+ secondValId);*/
 		}
 		return null;
+	}
+	
+	@Override
+	public Record visitArrayAssignStatements(ArrayAssignStatementsContext ctx) {
+		// TODO Auto-generated method stub
+		return super.visitArrayAssignStatements(ctx);
 	}
 
 	@Override
@@ -408,5 +457,66 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		}
 
 		return returnMethodRec;
+	}
+	
+	@Override
+	public Record visitNotExpression(NotExpressionContext ctx) {
+		Record arg1 = visit(ctx.getChild(1));
+		
+		if (!checkBool(arg1, ctx)) {
+			printError(ctx, "Only boolean maybe usd in ! stmt");
+		}
+		return new Record("notResult", "boolean");
+	}
+
+	@Override
+	public Record visitEqualExpression(EqualExpressionContext ctx) {
+		Record arg1 = visit(ctx.getChild(0));
+		Record arg2 = visit(ctx.getChild(2));
+		
+		if (!checkBool(arg1, ctx) || !checkBool(arg1, ctx)) {
+			printError(ctx, "Only boolean maybe usd in == stmt");
+		}
+		return new Record("equalResult", "boolean");
+	}
+
+	@Override
+	public Record visitOrExpression(OrExpressionContext ctx) {
+		Record arg1 = visit(ctx.getChild(0));
+		Record arg2 = visit(ctx.getChild(2));
+		
+		if (!checkBool(arg1, ctx) || !checkBool(arg1, ctx)) {
+			printError(ctx, "Only boolean maybe usd in || stmt");
+		}
+		return new Record("orResult", "boolean");
+	}
+	
+	@Override
+	public Record visitAndExpression(AndExpressionContext ctx) {
+		Record arg1 = visit(ctx.getChild(0));
+		Record arg2 = visit(ctx.getChild(2));
+		
+		if (!checkBool(arg1, ctx) || !checkBool(arg1, ctx)) {
+			printError(ctx, "Only boolean maybe usd in && stmt");
+		}
+		return new Record("andResult", "boolean");
+	}
+	
+	private boolean checkBool(Record rec, ExpressionContext ctx) {
+		if (rec == null) {
+			printError(ctx, "NPE on bool");
+		} 
+		return "boolean".equalsIgnoreCase(rec.getType());
+	}
+	
+
+	@Override
+	public Record visitArrayExpression(ArrayExpressionContext ctx) {
+		return new Record("intArray[i]", "int");
+	}
+	
+	@Override
+	public Record visitNewArrayExpression(NewArrayExpressionContext ctx) {
+		return new Record("intArray", "int[]");
 	}
 }

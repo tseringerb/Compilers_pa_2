@@ -76,13 +76,13 @@ identifierType: ID;
 expression :  //rBExpr #roundBracketxpression
  'this' #thisExpression
 | rBExpr #roundBracketxpression
-| expression '.' ID ('('methodInvocation?')' | '(' ')')* #methodCallExpression
+| expression '.' ID ('('methodInvocation?')' | '()')* #methodCallExpression
 | '!' expression #notExpression
 | expression MULT expression #multExpression
 | expression DIV expression  #divExpression
 | expression PLUS expression #plusExpression
 | expression MINUS expression #minusExpression
-| expression '<' expression  #lessExpression
+| expression ('<' | '>' | '>=' | '<=' ) expression  #lessExpression
 | expression '==' expression #equalExpression
 | expression '&&' expression #andExpression
 | expression '||' expression #orExpression
