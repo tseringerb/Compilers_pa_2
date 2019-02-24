@@ -16,7 +16,7 @@ public class MainMiniJavaChecker {
 
 	public static void main(String[] args) {
 		
-		String testProgram = "E:\\tserindgerGit\\tinyjava_samples\\RecursiveSum.java";
+		String testProgram = "E:\\tserindgerGit\\tinyjava_samples\\FacFib.java";
 		
 		// Parse input program
 		MiniJavaGrammarLexer lexer = null;

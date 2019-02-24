@@ -1,11 +1,19 @@
 package boris.tserinher.Records;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class MethodRecord extends Record {
 
 	private String containingClass;
+
+	private List<Record> parametersList = new ArrayList<>();
+	
+	public MethodRecord(String id, String type) {
+		super(id, type);
+	}
 
 	public String getContainingClass() {
 		return containingClass;
@@ -14,28 +22,34 @@ public class MethodRecord extends Record {
 	public void setContainingClass(String containingClass) {
 		this.containingClass = containingClass;
 	}
+	
+//	public void setParametersList(LinkedHashMap<String, VarRecord> parametersList) {
+//		this.parametersList = parametersList;
+//	}
+//
+//	public HashMap<String, VarRecord> getParametersList() {
+//		return parametersList;
+//	}
 
-	public MethodRecord(String id, String type) {
-		super(id, type);
+	public void putParameterRecord(Record parameterRecord) {
+		parametersList.add(parameterRecord);
 	}
 
-	private LinkedHashMap<String, VarRecord> parametersList = new LinkedHashMap<>();
+//	public VarRecord getParameterRecord(String parameterId) {
+//		return parametersList.get(parameterId);
+//	}
 
-	public HashMap<String, VarRecord> getParametersList() {
+	public void printParametersList() {
+		parametersList.forEach((record) -> {
+			System.out.format("Parameter: %s \n", record);
+		});
+	}
+
+	public List<Record> getParametersList() {
 		return parametersList;
 	}
 
-	public void putParameterRecord(VarRecord parameterRecord) {
-		parametersList.put(parameterRecord.getId(), parameterRecord);
-	}
-
-	public VarRecord getParameterRecord(String parameterId) {
-		return parametersList.get(parameterId);
-	}
-
-	public void printParametersList() {
-		parametersList.forEach((id, record) -> {
-			System.out.format("Parameter: %s \n", record);
-		});
+	public void setParametersList(List<Record> parametersList) {
+		this.parametersList = parametersList;
 	}
 }

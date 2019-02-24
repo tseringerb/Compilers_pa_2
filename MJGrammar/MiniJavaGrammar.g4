@@ -22,7 +22,7 @@ method : type ID ('('parametersList')' | '()')  '{'methodBody'}';
 
 methodBody : field* statement* returnStatement;
 
-methodInvocation: expression(',' expression)*;
+methodInvocation: expression ( ',' expression)*;
 
 parametersList : parameter (',' parameter)*;
 
@@ -76,7 +76,7 @@ identifierType: ID;
 expression :  //rBExpr #roundBracketxpression
  'this' #thisExpression
 | rBExpr #roundBracketxpression
-| expression '.' ID ('('methodInvocation?')' | '()')* #methodCallExpression
+| expression '.' ID ('('methodInvocation?')' | '(' ')')* #methodCallExpression
 | '!' expression #notExpression
 | expression MULT expression #multExpression
 | expression DIV expression  #divExpression
