@@ -85,7 +85,7 @@ expression :  //rBExpr #roundBracketxpression
 | expression DIV expression  #divExpression
 | expression PLUS expression #plusExpression
 | expression MINUS expression #minusExpression
-| expression '<' expression  #lessExpression
+| expression ('<' | '>' | '>=' | '<=' ) expression  #lessExpression
 | expression '==' expression #equalExpression
 | expression '&&' expression #andExpression
 | expression '||' expression #orExpression
