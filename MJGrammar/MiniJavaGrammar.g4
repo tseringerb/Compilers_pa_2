@@ -43,7 +43,7 @@ statement:   variableDeclarationStatement
 	| breakeStatement
 	| continueStatement;
 
-variableDeclarationStatement: type ID ('=' expression)? SC;
+variableDeclarationStatement: type ID SC; //type ID ('=' expression)? SC;
 
 assignmentStatement: type? ID '=' expression SC;
 
@@ -73,8 +73,9 @@ stringType: 'String';
 intArrayType: 'int[]';
 identifierType: ID;
 
-expression :  rBExpr #roundBracketxpression
-| THIS #thosExpression
+expression :  //rBExpr #roundBracketxpression
+ 'this' #thisExpression
+| rBExpr #roundBracketxpression
 | expression '.' ID ('('methodInvocation?')' | '()')* #methodCallExpression
 | '!' expression #notExpression
 | expression MULT expression #multExpression
@@ -110,14 +111,17 @@ BOOLEAN	: 'true'
 | 'false';
 CHAR: '\'' .  '\'';
 STRING: '"' .*? '"';
+THIS : 'this';
 ID  : ('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
+
+
+
 BREAK: 'break;';
 CONTINUE: 'continue;'; 
 SC : ';' ;
 LINE_COMMENT : '//' ~[\r\n]* -> skip;
 COMMENT : '/*' .*? '*/' -> skip;
 WS : [ \t\r\n]+ -> skip ;
-THIS : 'this';
 NULL : 'null';
 //SIGN : (PLUS|MINUS)?;
 

@@ -152,13 +152,14 @@ public class SymbolTableListener extends MiniJavaGrammarBaseListener {
 		String id = ctx.getChild(1).toString();
 		String type = ctx.getChild(0).getChild(0).getChild(0).toString();
 		
-		System.out.println(type + " " + id + " " + symbolTable.getCurrentScopeType());
-		
-		//symbolTable.enterScope();
-		//symbolTable.setCurrentScopeType("method");
+		System.out.println("METHOD ENTER " + type + " " + id + " " + symbolTable.getCurrentScopeName() + " " + currentClass);
 		
 		currentMethod = new MethodRecord(id, type);
+		
+		currentMethod.setContainingClass(currentClass.getId());
+		
 		currentClass.putMethodRecord(currentMethod);
+		
 		symbolTable.putRecord(id, currentMethod	);
 
 		symbolTable.enterScope();
@@ -177,6 +178,8 @@ public class SymbolTableListener extends MiniJavaGrammarBaseListener {
 	public void enterField(FieldContext ctx) {
 		String id = ctx.getChild(1).toString();
 		String type = ctx.getChild(0).getChild(0).getChild(0).toString();
+		
+		System.out.println("TABLE" + symbolTable.getCurrentScopeName());
 				
 		VarRecord fieldRecord = new VarRecord(id, type);
 		symbolTable.putRecord(id, fieldRecord);
