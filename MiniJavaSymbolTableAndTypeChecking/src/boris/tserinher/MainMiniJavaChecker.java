@@ -16,7 +16,7 @@ public class MainMiniJavaChecker {
 
 	public static void main(String[] args) {
 		
-		String testProgram = args[0];
+		String testProgram = "E:\\tserindgerGit\\tinyjava_samples\\RecursiveSum.java";
 		
 		// Parse input program
 		MiniJavaGrammarLexer lexer = null;
@@ -31,7 +31,7 @@ public class MainMiniJavaChecker {
 
 		
 		// Display tree
-		Trees.inspect(tree, parser);
+		//Trees.inspect(tree, parser);
 		
 		// Indented tree print using a listener
 		MiniJavaSymbolTable miniJavaSymbolTable = new MiniJavaSymbolTable();
