@@ -213,9 +213,10 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 	@Override
 	public Record visitBoolTypeExpression(BoolTypeExpressionContext ctx) {
-		System.out.println("INSIDE BOOLTYPE");
+		System.out.println("INSIDE BOOLTYPE " + ctx.getText());
 		// TODO Auto-generated method stub
-		return super.visitBoolTypeExpression(ctx);
+		Record record = new Record("boolean", "boolean");
+		return record ; //super.visitBoolTypeExpression(ctx);
 	}
 
 	@Override
