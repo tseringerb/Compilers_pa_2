@@ -48,8 +48,6 @@ import boris.tserinher.Records.VarRecord;
 import boris.tserinher.SymbolTable.MiniJavaSymbolTable;
 
 public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
-
-
 	private MiniJavaSymbolTable mjSymbolTable;
 	private String currentScope; // for debug
 	private String notDeclareError = "Not decalre identifire";
@@ -415,21 +413,28 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitMethod(MethodContext ctx) {
 		mjSymbolTable.enterScope();
 		String errMessage = "Wrong return type in method";
-		String returnType;
+		String voidErrMessage = "Void methods cannot return a value";
+		String emptyReturnErrMessage = "This method must return a result";
+		String returnType = "";
 		String methodType = ctx.getChild(0).getText();
 		int returnPosition;
 		if (ctx.getChildCount() == 6) {
 			returnPosition = ctx.getChild(4).getChildCount() - 1;
 			visit(ctx.getChild(4));
 			returnType = visit(ctx.getChild(4).getChild(returnPosition)).getType();
+			
 		} else {
 			returnPosition = ctx.getChild(6).getChildCount() - 1;
 			visit(ctx.getChild(3));
 			visit(ctx.getChild(6));
-			returnType = visit(ctx.getChild(6).getChild(returnPosition)).getType();
+			returnType = visit(ctx.getChild(6).getChild(returnPosition)).getType();			
 		}
-
-		if (!returnType.equals(methodType)) {
+		
+		if(methodType.equals("void") && !returnType.equals("void")){
+			printError(ctx, voidErrMessage);
+		}  else if(!methodType.equals("void") && returnType.equals("void")){
+			printError(ctx, emptyReturnErrMessage);
+		} 	else if (!returnType.equals(methodType)) {
 			printError(ctx, errMessage);
 		}
 
@@ -440,7 +445,14 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 	@Override
 	public Record visitReturnStatement(ReturnStatementContext ctx) {
-		Record returnRec = visit(ctx.getChild(1));
+		System.out.println("RETURN TYPE VISIT: " + ctx.getText());
+		Record returnRec = null;
+		if(ctx.getText().equals("")){
+			//System.out.println("RETURN VOID !@!!!!!!!!!!");
+			returnRec = new Record("void", "void");
+		}else{
+			returnRec = visit(ctx.getChild(1));
+		}
 		return returnRec;
 	}
 
