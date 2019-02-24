@@ -16,7 +16,7 @@ classBody : field* method*;
 
 field : type ID SC;
 
-method : type ID ('('parametersList')' | '()')  '{'methodBody'}';
+method : (type|methodType) ID ('('parametersList')' | '()')  '{'methodBody'}';
 
 //access : 'public'?; 
 
@@ -55,7 +55,7 @@ doWhileStatement: 'do' statement 'while' rBExpr SC;
 
 printStatement: 'System.out.println' rBExpr SC;
 
-returnStatement: 'return' expression SC;
+returnStatement: ('return' expression SC)?;
 
 codeBlockStatement: '{' statement* '}';
 
@@ -66,12 +66,15 @@ breakeStatement: BREAK;
 continueStatement: CONTINUE;
      
 type : intType| booleanType | charType | stringType | intArrayType | identifierType;
+methodType: voidType;
 intType : 'int';
 booleanType: 'boolean';
 charType: 'char';
 stringType: 'String';
 intArrayType: 'int[]';
 identifierType: ID;
+voidType: 'void';
+
 
 expression :  //rBExpr #roundBracketxpression
  'this' #thisExpression
@@ -82,7 +85,7 @@ expression :  //rBExpr #roundBracketxpression
 | expression DIV expression  #divExpression
 | expression PLUS expression #plusExpression
 | expression MINUS expression #minusExpression
-| expression '<' expression  #lessExpression
+| expression ('<' | '>' | '>=' | '<=' ) expression  #lessExpression
 | expression '==' expression #equalExpression
 | expression '&&' expression #andExpression
 | expression '||' expression #orExpression

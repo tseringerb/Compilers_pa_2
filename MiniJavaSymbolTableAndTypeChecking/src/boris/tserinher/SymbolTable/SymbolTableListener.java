@@ -149,6 +149,8 @@ public class SymbolTableListener extends MiniJavaGrammarBaseListener {
 
 	@Override
 	public void enterMethod(MethodContext ctx) {
+		System.out.println("VISIT METHOD " + ctx.getText());
+		System.out.println("METHOD ENTER " + ctx.getChild(0).getChild(0).getChild(0).getText() + " " + ctx.getChild(1).getText() + " " + symbolTable.getCurrentScopeName() + " " + currentClass);
 		String id = ctx.getChild(1).toString();
 		String type = ctx.getChild(0).getChild(0).getChild(0).toString();
 		
