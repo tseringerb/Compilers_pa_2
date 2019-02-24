@@ -7,37 +7,37 @@ import java.util.List;
 
 public class MethodRecord extends Record {
 
-	private String containingClass;
+ private String containingClass;
 
-	private List<Record> parametersList = new ArrayList<>();
-	
-	public MethodRecord(String id, String type) {
-		super(id, type);
-	}
+ private List<Record> parametersList = new ArrayList<>();
+ 
+ public MethodRecord(String id, String type) {
+  super(id, type);
+ }
 
-	public String getContainingClass() {
-		return containingClass;
-	}
+ public String getContainingClass() {
+  return containingClass;
+ }
 
-	public void setContainingClass(String containingClass) {
-		this.containingClass = containingClass;
-	}
+ public void setContainingClass(String containingClass) {
+  this.containingClass = containingClass;
+ }
 
-	public void putParameterRecord(Record parameterRecord) {
-		parametersList.add(parameterRecord);
-	}
+ public void putParameterRecord(Record parameterRecord) {
+  parametersList.add(parameterRecord);
+ }
 
-	public void printParametersList() {
-		parametersList.forEach((record) -> {
-			System.out.format("Parameter: %s \n", record);
-		});
-	}
+ public void printParametersList() {
+  parametersList.forEach((record) -> {
+   System.out.format("Parameter: %s \n", record);
+  });
+ }
 
-	public List<Record> getParametersList() {
-		return parametersList;
-	}
+ public List<Record> getParametersList() {
+  return parametersList;
+ }
 
-	public void setParametersList(List<Record> parametersList) {
-		this.parametersList = parametersList;
-	}
+ public void setParametersList(List<Record> parametersList) {
+  this.parametersList = parametersList;
+ }
 }
