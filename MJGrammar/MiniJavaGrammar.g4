@@ -16,13 +16,13 @@ classBody : field* method*;
 
 field : type ID SC;
 
-method : type ID ('('parametersList')' | '()')  '{'methodBody'}';
+method : (type|methodType) ID ('('parametersList')' | '()')  '{'methodBody'}';
 
 //access : 'public'?; 
 
 methodBody : field* statement* returnStatement;
 
-methodInvocation: expression ( ',' expression)*;
+methodInvocation: expression(',' expression)*;
 
 parametersList : parameter (',' parameter)*;
 
@@ -43,7 +43,7 @@ statement:   variableDeclarationStatement
 	| breakeStatement
 	| continueStatement;
 
-variableDeclarationStatement: type ID ('=' expression)? SC;
+variableDeclarationStatement: type ID SC; //type ID ('=' expression)? SC;
 
 assignmentStatement: type? ID '=' expression SC;
 
@@ -55,7 +55,7 @@ doWhileStatement: 'do' statement 'while' rBExpr SC;
 
 printStatement: 'System.out.println' rBExpr SC;
 
-returnStatement: 'return' expression SC;
+returnStatement: ('return' expression SC)?;
 
 codeBlockStatement: '{' statement* '}';
 
@@ -66,17 +66,20 @@ breakeStatement: BREAK;
 continueStatement: CONTINUE;
      
 type : intType| booleanType | charType | stringType | intArrayType | identifierType;
+methodType: voidType;
 intType : 'int';
 booleanType: 'boolean';
 charType: 'char';
 stringType: 'String';
 intArrayType: 'int[]';
 identifierType: ID;
+voidType: 'void';
+
 
 expression :  //rBExpr #roundBracketxpression
  'this' #thisExpression
 | rBExpr #roundBracketxpression
-| expression '.' ID ('('methodInvocation?')' | '(' ')')* #methodCallExpression
+| expression '.' ID ('('methodInvocation?')' | '()')* #methodCallExpression
 | '!' expression #notExpression
 | expression MULT expression #multExpression
 | expression DIV expression  #divExpression
@@ -113,6 +116,9 @@ CHAR: '\'' .  '\'';
 STRING: '"' .*? '"';
 THIS : 'this';
 ID  : ('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
+
+
+
 BREAK: 'break;';
 CONTINUE: 'continue;'; 
 SC : ';' ;
