@@ -22,7 +22,7 @@ method : type ID ('('parametersList')' | '()')  '{'methodBody'}';
 
 methodBody : field* statement* returnStatement;
 
-methodInvocation: expression(',' expression)*;
+methodInvocation: expression ( ',' expression)*;
 
 parametersList : parameter (',' parameter)*;
 
@@ -43,7 +43,7 @@ statement:   variableDeclarationStatement
 	| breakeStatement
 	| continueStatement;
 
-variableDeclarationStatement: type ID SC; //type ID ('=' expression)? SC;
+variableDeclarationStatement: type ID ('=' expression)? SC;
 
 assignmentStatement: type? ID '=' expression SC;
 
@@ -76,7 +76,7 @@ identifierType: ID;
 expression :  //rBExpr #roundBracketxpression
  'this' #thisExpression
 | rBExpr #roundBracketxpression
-| expression '.' ID ('('methodInvocation?')' | '()')* #methodCallExpression
+| expression '.' ID ('('methodInvocation?')' | '(' ')')* #methodCallExpression
 | '!' expression #notExpression
 | expression MULT expression #multExpression
 | expression DIV expression  #divExpression
@@ -113,9 +113,6 @@ CHAR: '\'' .  '\'';
 STRING: '"' .*? '"';
 THIS : 'this';
 ID  : ('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
-
-
-
 BREAK: 'break;';
 CONTINUE: 'continue;'; 
 SC : ';' ;
