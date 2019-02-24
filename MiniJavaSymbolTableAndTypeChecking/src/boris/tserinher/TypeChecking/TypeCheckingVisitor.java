@@ -83,13 +83,12 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		numChildren = ctx.getChildCount();
 		for (int i = 2; i < numChildren; i += 2) {
 			Record rec = visit(ctx.getChild(i));
-			
+
 			String type = rec.getType();
 			if (!type.equals(firstType)) {
 				printError(ctx, errMsg);
 			}
 		}
-
 
 		Record mathRecord = new Record(firstType, firstType);
 		System.out.println("MATH RECORD RET " + mathRecord);
@@ -151,26 +150,26 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 	@Override
 	public Record visitPlusExpression(PlusExpressionContext ctx) {
-	
+
 		String errMsg = "Wrong type in Additative Expression";
 
 		Record first = visit(ctx.getChild(0));
 		String firstType = first.getType(); // Get first type
 		String firstId = first.getId();
 
-		if (firstType.equals("String") || firstType.equals("Char")) {
+		Record result = null;
+		if (firstType.equalsIgnoreCase("String") || firstType.equalsIgnoreCase("Char")) {
 			int numChildren = ctx.getChildCount();
 
 			for (int i = 2; i < numChildren; i += 2) {
 				String type = visit(ctx.getChild(i)).getType();
-				if (!type.equals(firstType)) {
+				if (!type.equalsIgnoreCase("String") && !type.equalsIgnoreCase("char")) {
 					printError(ctx, errMsg);
 				}
 			}
+			return new Record("result", "string");
 		} else
 			return checkMathExpr(ctx, errMsg);// firstType;
-
-		return super.visitPlusExpression(ctx);
 	}
 
 	@Override
@@ -205,14 +204,14 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 	@Override
 	public Record visitIDExpression(IDExpressionContext ctx) {
-	
+
 		String errMesg = "Not declare identifire";
 		String id = ctx.getText();
 
 		Record idRecord = mjSymbolTable.lookup(id);
 
-		//System.out.println("<<<<<IDREC" + idRecord);
-		
+		// System.out.println("<<<<<IDREC" + idRecord);
+
 		if (idRecord == null) {
 			printError(ctx, errMesg);
 			System.out.println(id);
@@ -232,7 +231,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		System.out.println("INSIDE BOOLTYPE " + ctx.getText());
 		// TODO Auto-generated method stub
 		Record record = new Record("boolean", "boolean");
-		return record ; //super.visitBoolTypeExpression(ctx);
+		return record; // super.visitBoolTypeExpression(ctx);
 	}
 
 	@Override
@@ -246,7 +245,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitThisExpression(ThisExpressionContext ctx) {
 		// mjSymbolTable.getCurrentScopeObj();
 		String thisType = currentMethod.getContainingClass();
-		return new Record(thisType, thisType);//super.visitThisExpression(ctx);
+		return new Record(thisType, thisType);// super.visitThisExpression(ctx);
 	}
 
 	@Override
@@ -265,7 +264,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		}
 		return super.visitWhileStatement(ctx);
 	}
-	
+
 	@Override
 	public Record visitDoWhileStatement(DoWhileStatementContext ctx) {
 		try {
@@ -281,7 +280,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		}
 		return super.visitDoWhileStatement(ctx);
 	}
-	
+
 	@Override
 	public Record visitIfStatment(IfStatmentContext ctx) {
 		try {
@@ -289,7 +288,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 			if (ifArg == null) {
 				printError(ctx, "NPE on if");
 			} else if (!ifArg.getType().equalsIgnoreCase("boolean")) {
-				printError(ctx,"If stmt not bool, it is " + ifArg.getType());
+				printError(ctx, "If stmt not bool, it is " + ifArg.getType());
 			}
 
 		} catch (Exception e) {
@@ -305,7 +304,8 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		if (arg1 == null || arg2 == null) {
 			printError(ctx, "NPE on less expression");
 			return null;
-		} else if (!arg1.getType().equalsIgnoreCase("int") || !arg1.getType().equalsIgnoreCase("int")) {
+		} else if (!arg1.getType().equalsIgnoreCase("int") && !arg2.getType().equalsIgnoreCase("int")
+				&& !arg1.getType().equalsIgnoreCase("char") && !arg2.getType().equalsIgnoreCase("char")) {
 			printError(ctx, "args of less node must be int");
 			return null;
 		}
@@ -320,9 +320,9 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		System.out.println("VISIT ASSIGN " + ctx.getText());
 		System.out.println(ctx.getChild(0).getText());
 		String firstValId = ctx.getChild(0).getText();
-		//mjSymbolTable.lookup(firstValId);
-		//String firstValId = visit(ctx.getChild(0)).getType();
-		//System.out.println("++++++" + ctx.getChild(0).toString());
+		// mjSymbolTable.lookup(firstValId);
+		// String firstValId = visit(ctx.getChild(0)).getType();
+		// System.out.println("++++++" + ctx.getChild(0).toString());
 		String secondValId = null;
 		// visit(ctx.getChild(0));
 		Record firstRec = mjSymbolTable.lookup(firstValId);
@@ -330,12 +330,13 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		if (firstRec != null && secondRec != null) {
 			firstValId = firstRec.getType();
 			secondValId = secondRec.getType();
-            if ("class".equalsIgnoreCase(secondValId)){
+			if ("class".equalsIgnoreCase(secondValId)) {
 				secondValId = secondRec.getId();
 			}
 			if (!firstValId.equalsIgnoreCase(secondValId)) {
 				printError(ctx, errMsg);
-				System.out.println("!!!!!!! _ >>> " + firstValId + " + " + secondValId + " -> " + ctx.getChild(2).getText());
+				System.out.println(
+						"!!!!!!! _ >>> " + firstValId + " + " + secondValId + " -> " + ctx.getChild(2).getText());
 			}
 		} else {
 //
@@ -344,12 +345,14 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 			printError(ctx, "NPE on assignment");
 		}
 
-		/*	mjSymbolTable.printTable();
-			System.out.println(firstValId +" != "+ secondValId);*/
-		
+		/*
+		 * mjSymbolTable.printTable(); System.out.println(firstValId +" != "+
+		 * secondValId);
+		 */
+
 		return null;
 	}
-	
+
 	@Override
 	public Record visitArrayAssignStatements(ArrayAssignStatementsContext ctx) {
 		// TODO Auto-generated method stub
@@ -392,20 +395,19 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 		if (record == null) {
 			try {
-		        Record rec =  visit(ctx.getChild(0));
-		        if (rec instanceof VarRecord) {
-		        	rec =  mjSymbolTable.lookup(rec.getType());
-		        }
-		        if ("string".equalsIgnoreCase(rec.getType())
-		        		&& "length".equalsIgnoreCase(ident)) {
-		        	methodRecord = new MethodRecord(ident, "int");
-		        } else  if ("string".equalsIgnoreCase(rec.getType())
-		        		&& "charAt".equalsIgnoreCase(ident)) {
-		        	methodRecord = new MethodRecord(ident, "char");
-		        } else {
-		        	ClassRecord callingObject = (ClassRecord) rec;
-					methodRecord = callingObject.getMethodRecord(ident);
-		        }
+				Record rec = visit(ctx.getChild(0));
+				if (rec instanceof VarRecord) {
+					if ("string".equalsIgnoreCase(rec.getType()) && "length".equalsIgnoreCase(ident)) {
+						return new MethodRecord(ident, "int");
+					} else if ("string".equalsIgnoreCase(rec.getType()) && "charAt".equalsIgnoreCase(ident)) {
+						return new MethodRecord(ident, "char");
+					} else {
+						rec = mjSymbolTable.lookup(rec.getType());
+					}
+				}
+				ClassRecord callingObject = (ClassRecord) rec;
+				methodRecord = callingObject.getMethodRecord(ident);
+
 			} catch (Exception e) {
 				printError(ctx, "It seems that method does not exist");
 				return super.visitMethodCallExpression(ctx);
@@ -422,7 +424,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 			List<Record> args1 = args.getParametersList();
 
-			if ((args1.size() != methodArgs.size())) {
+			if ((args1.size() != methodArgs.size() && !(ident.equalsIgnoreCase("charAt") && args1.size() == 1))) {
 				printError(ctx,
 						"Wrong amount of args, we have " + args1.size() + " but there should be " + methodArgs.size());
 			} else {
@@ -440,12 +442,12 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 	@Override
 	public Record visitNewObjectExpression(NewObjectExpressionContext ctx) {
-		//System.out.println("~~~~~NEW " + ctx.getChild(1).getText());
-	  //  mjSymbolTable.printTable();
+		// System.out.println("~~~~~NEW " + ctx.getChild(1).getText());
+		// mjSymbolTable.printTable();
 		String objectType = ctx.getChild(1).toString();
-		//Record rec = new Record(objectType, objectType);
-		ClassRecord rec = (ClassRecord)mjSymbolTable.lookup(objectType);
-		
+		// Record rec = new Record(objectType, objectType);
+		ClassRecord rec = (ClassRecord) mjSymbolTable.lookup(objectType);
+
 		return rec;
 	}
 
@@ -462,19 +464,19 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 			returnPosition = ctx.getChild(4).getChildCount() - 1;
 			visit(ctx.getChild(4));
 			returnType = visit(ctx.getChild(4).getChild(returnPosition)).getType();
-			
+
 		} else {
 			returnPosition = ctx.getChild(6).getChildCount() - 1;
 			visit(ctx.getChild(3));
 			visit(ctx.getChild(6));
-			returnType = visit(ctx.getChild(6).getChild(returnPosition)).getType();			
+			returnType = visit(ctx.getChild(6).getChild(returnPosition)).getType();
 		}
-		
-		if(methodType.equals("void") && !returnType.equals("void")){
+
+		if (methodType.equals("void") && !returnType.equals("void")) {
 			printError(ctx, voidErrMessage);
-		}  else if(!methodType.equals("void") && returnType.equals("void")){
+		} else if (!methodType.equals("void") && returnType.equals("void")) {
 			printError(ctx, emptyReturnErrMessage);
-		} 	else if (!returnType.equals(methodType)) {
+		} else if (!returnType.equals(methodType)) {
 			printError(ctx, errMessage);
 		}
 
@@ -487,10 +489,10 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitReturnStatement(ReturnStatementContext ctx) {
 		System.out.println("RETURN TYPE VISIT: " + ctx.getText());
 		Record returnRec = null;
-		if(ctx.getText().equals("")){
-			//System.out.println("RETURN VOID !@!!!!!!!!!!");
+		if (ctx.getText().equals("")) {
+			// System.out.println("RETURN VOID !@!!!!!!!!!!");
 			returnRec = new Record("void", "void");
-		}else{
+		} else {
 			returnRec = visit(ctx.getChild(1));
 		}
 		return returnRec;
@@ -510,11 +512,11 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 
 		return returnMethodRec;
 	}
-	
+
 	@Override
 	public Record visitNotExpression(NotExpressionContext ctx) {
 		Record arg1 = visit(ctx.getChild(1));
-		
+
 		if (!checkBool(arg1, ctx)) {
 			printError(ctx, "Only boolean maybe usd in ! stmt");
 		}
@@ -525,7 +527,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitEqualExpression(EqualExpressionContext ctx) {
 		Record arg1 = visit(ctx.getChild(0));
 		Record arg2 = visit(ctx.getChild(2));
-		
+
 		if (!arg1.getType().equalsIgnoreCase(arg2.getType())) {
 			printError(ctx, "Different types cannot be used in == stmt");
 		}
@@ -536,37 +538,36 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 	public Record visitOrExpression(OrExpressionContext ctx) {
 		Record arg1 = visit(ctx.getChild(0));
 		Record arg2 = visit(ctx.getChild(2));
-		
+
 		if (!checkBool(arg1, ctx) || !checkBool(arg1, ctx)) {
 			printError(ctx, "Only boolean maybe usd in || stmt");
 		}
 		return new Record("orResult", "boolean");
 	}
-	
+
 	@Override
 	public Record visitAndExpression(AndExpressionContext ctx) {
 		Record arg1 = visit(ctx.getChild(0));
 		Record arg2 = visit(ctx.getChild(2));
-		
+
 		if (!checkBool(arg1, ctx) || !checkBool(arg1, ctx)) {
 			printError(ctx, "Only boolean maybe usd in && stmt");
 		}
 		return new Record("andResult", "boolean");
 	}
-	
+
 	private boolean checkBool(Record rec, ExpressionContext ctx) {
 		if (rec == null) {
 			printError(ctx, "NPE on bool");
-		} 
+		}
 		return "boolean".equalsIgnoreCase(rec.getType());
 	}
-	
 
 	@Override
 	public Record visitArrayExpression(ArrayExpressionContext ctx) {
 		return new Record("intArray[i]", "int");
 	}
-	
+
 	@Override
 	public Record visitNewArrayExpression(NewArrayExpressionContext ctx) {
 		return new Record("intArray", "int[]");
@@ -577,7 +578,7 @@ public class TypeCheckingVisitor extends MiniJavaGrammarBaseVisitor<Record> {
 		// TODO Auto-generated method stub
 		return super.visitIdentifierType(ctx);
 	}
-	
+
 	@Override
 	public Record visitStringExpression(StringExpressionContext ctx) {
 		// TODO Auto-generated method stub
