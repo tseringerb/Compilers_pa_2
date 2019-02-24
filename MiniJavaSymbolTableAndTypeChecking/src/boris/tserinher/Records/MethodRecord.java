@@ -1,19 +1,34 @@
 package boris.tserinher.Records;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class MethodRecord extends Record {
+	
+	private String containingClass;
+
+	public String getContainingClass() {
+		return containingClass;
+	}
+
+	public void setContainingClass(String containingClass) {
+		this.containingClass = containingClass;
+	}
 
 	public MethodRecord(String id, String type) {
 		super(id, type);
 	}
-	private HashMap<String , VarRecord> parametersList = new HashMap<>();
+	private LinkedHashMap<String , Record> parametersList = new LinkedHashMap<>();	
 	
-	public void putParameterRecord(VarRecord parameterRecord){
+	public HashMap<String, Record> getParametersList() {
+		return parametersList;
+	}
+
+	public void putParameterRecord(Record parameterRecord){
 		parametersList.put(parameterRecord.getId(), parameterRecord);
 	}
 	
-	public VarRecord getParameterRecord(String parameterId){
+	public Record getParameterRecord(String parameterId){
 		return parametersList.get(parameterId);
 	}
 	
@@ -22,4 +37,6 @@ public class MethodRecord extends Record {
 			System.out.format("Parameter: %s \n", record);
 		});
 	}
+	
+	
 }

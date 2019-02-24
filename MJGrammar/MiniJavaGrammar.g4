@@ -43,7 +43,7 @@ statement:   variableDeclarationStatement
 	| breakeStatement
 	| continueStatement;
 
-variableDeclarationStatement: type ID ('=' expression)? SC;
+variableDeclarationStatement: type ID SC; //type ID ('=' expression)? SC;
 
 assignmentStatement: type? ID '=' expression SC;
 
@@ -113,6 +113,9 @@ CHAR: '\'' .  '\'';
 STRING: '"' .*? '"';
 THIS : 'this';
 ID  : ('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
+
+
+
 BREAK: 'break;';
 CONTINUE: 'continue;'; 
 SC : ';' ;
